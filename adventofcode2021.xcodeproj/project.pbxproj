@@ -21,6 +21,8 @@
 		029DBF75275EB47B008963AA /* day05.txt in CopyFiles */ = {isa = PBXBuildFile; fileRef = 029DBF5F275EAE69008963AA /* day05.txt */; };
 		029DBF7A275EB776008963AA /* day06.swift in Sources */ = {isa = PBXBuildFile; fileRef = 029DBF79275EB776008963AA /* day06.swift */; };
 		029DBF7B275EBA04008963AA /* day06.txt in CopyFiles */ = {isa = PBXBuildFile; fileRef = 029DBF77275EB776008963AA /* day06.txt */; };
+		029DBF7E275FE1FA008963AA /* day07.swift in Sources */ = {isa = PBXBuildFile; fileRef = 029DBF7D275FE1FA008963AA /* day07.swift */; };
+		029DBF81275FE298008963AA /* day07.txt in CopyFiles */ = {isa = PBXBuildFile; fileRef = 029DBF7F275FE28F008963AA /* day07.txt */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -30,6 +32,7 @@
 			dstPath = "";
 			dstSubfolderSpec = 16;
 			files = (
+				029DBF81275FE298008963AA /* day07.txt in CopyFiles */,
 				029DBF7B275EBA04008963AA /* day06.txt in CopyFiles */,
 				029DBF71275EB47B008963AA /* day01.txt in CopyFiles */,
 				029DBF72275EB47B008963AA /* day02.txt in CopyFiles */,
@@ -64,6 +67,9 @@
 		029DBF77275EB776008963AA /* day06.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = day06.txt; sourceTree = "<group>"; };
 		029DBF78275EB776008963AA /* README.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
 		029DBF79275EB776008963AA /* day06.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = day06.swift; sourceTree = "<group>"; };
+		029DBF7D275FE1FA008963AA /* day07.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = day07.swift; sourceTree = "<group>"; };
+		029DBF7F275FE28F008963AA /* day07.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = day07.txt; sourceTree = "<group>"; };
+		029DBF80275FE28F008963AA /* README.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -88,6 +94,7 @@
 				029DBF5A275EAE69008963AA /* day04 */,
 				029DBF5E275EAE69008963AA /* day05 */,
 				029DBF76275EB776008963AA /* day06 */,
+				029DBF7C275FE1E5008963AA /* day07 */,
 				029DBF62275EAE69008963AA /* README.md */,
 				029DBF49275EAE3A008963AA /* Products */,
 			);
@@ -169,6 +176,16 @@
 			path = day06;
 			sourceTree = "<group>";
 		};
+		029DBF7C275FE1E5008963AA /* day07 */ = {
+			isa = PBXGroup;
+			children = (
+				029DBF7F275FE28F008963AA /* day07.txt */,
+				029DBF80275FE28F008963AA /* README.md */,
+				029DBF7D275FE1FA008963AA /* day07.swift */,
+			);
+			path = day07;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -235,6 +252,7 @@
 				029DBF6B275EAE69008963AA /* day03.swift in Sources */,
 				029DBF68275EAE69008963AA /* day01.swift in Sources */,
 				029DBF69275EAE69008963AA /* day04.swift in Sources */,
+				029DBF7E275FE1FA008963AA /* day07.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

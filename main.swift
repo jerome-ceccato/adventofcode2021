@@ -44,7 +44,7 @@ func run(day: Int) {
 }
 
 func run() {
-    for d in 1 ... 6 {
+    for d in 1 ... 7 {
         run(day: d)
     }
 }
