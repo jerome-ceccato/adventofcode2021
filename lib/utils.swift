@@ -12,3 +12,10 @@ public extension StringProtocol {
         self[index(startIndex, offsetBy: offset)]
     }
 }
+
+public extension Collection {
+    subscript (safe offset: Int) -> Element? {
+        let index = index(startIndex, offsetBy: offset)
+        return indices.contains(index) ? self[index] : nil
+    }
+}
