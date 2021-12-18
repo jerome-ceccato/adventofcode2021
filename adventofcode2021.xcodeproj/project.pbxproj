@@ -60,6 +60,7 @@
 		029DBFEF276E2C50008963AA /* day23.txt in CopyFiles */ = {isa = PBXBuildFile; fileRef = 029DBFBF276E2C15008963AA /* day23.txt */; };
 		029DBFF0276E2C50008963AA /* day24.txt in CopyFiles */ = {isa = PBXBuildFile; fileRef = 029DBFC6276E2C15008963AA /* day24.txt */; };
 		029DBFF1276E2C50008963AA /* day25.txt in CopyFiles */ = {isa = PBXBuildFile; fileRef = 029DBFAB276E2C15008963AA /* day25.txt */; };
+		029DBFF3276E392E008963AA /* utils.swift in Sources */ = {isa = PBXBuildFile; fileRef = 029DBFF2276E392E008963AA /* utils.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -181,6 +182,7 @@
 		029DBFCD276E2C15008963AA /* day12.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = day12.txt; sourceTree = "<group>"; };
 		029DBFCE276E2C15008963AA /* day12.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = day12.swift; sourceTree = "<group>"; };
 		029DBFCF276E2C15008963AA /* README.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
+		029DBFF2276E392E008963AA /* utils.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = utils.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -293,6 +295,7 @@
 			children = (
 				029DBF6F275EAED8008963AA /* AOCDay.swift */,
 				029DBF8A276E2BEC008963AA /* run.swift */,
+				029DBFF2276E392E008963AA /* utils.swift */,
 			);
 			path = lib;
 			sourceTree = "<group>";
@@ -571,6 +574,7 @@
 				029DBF86276E2710008963AA /* day08.swift in Sources */,
 				029DBFDE276E2C16008963AA /* day24.swift in Sources */,
 				029DBFE0276E2C16008963AA /* day12.swift in Sources */,
+				029DBFF3276E392E008963AA /* utils.swift in Sources */,
 				029DBF7A275EB776008963AA /* day06.swift in Sources */,
 				029DBF70275EAED8008963AA /* AOCDay.swift in Sources */,
 				029DBF6E275EAE8E008963AA /* main.swift in Sources */,

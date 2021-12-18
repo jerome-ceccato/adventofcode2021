@@ -7,12 +7,6 @@
 
 import Foundation
 
-private extension StringProtocol {
-    subscript(offset: Int) -> Character {
-        self[index(startIndex, offsetBy: offset)]
-    }
-}
-
 final class Day03: AOCDay {
     func parseInput(_ raw: String) -> [String] {
         return raw.components(separatedBy: "\n").filter { line in !line.isEmpty }
