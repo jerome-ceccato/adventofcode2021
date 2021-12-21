@@ -170,8 +170,19 @@ final class Day18: AOCDay {
     }
 
     func part2(rawInput: String) -> CustomStringConvertible {
-        // let input = parseInput(rawInput)
+        var magnitudes = Set<Int>()
+        let inputSize = parseInput(rawInput).count
+        for i in 0 ..< inputSize {
+            for j in 0 ..< inputSize {
+                if i != j {
+                    // Load the input each time because the reduction is mutating it
+                    let input = parseInput(rawInput)
+                    let addition = reduce(pair: Pair(left: Node(pair: input[i]), right: Node(pair: input[j])))
+                    magnitudes.insert(magnitude(pair: addition))
+                }
+            }
+        }
         
-        return "Unimplemented"
+        return magnitudes.max()!
     }
 }
