@@ -23,41 +23,11 @@ final class Day17: AOCDay {
     func usableXRange(bbox: BoundingBox) -> ClosedRange<Int> {
         let target = bbox.x
         let lowest = (1...).first { n in (n * (n + 1) / 2) >= target.lowerBound }!
-        let highest = (lowest...).first { n in
-            var distance = 0
-            var n = n
-            while n > 0 {
-                distance += n
-                n -= 1
-                if target.contains(distance) {
-                    return false
-                }
-            }
-            return true
-        }!
-        return (lowest - 1) ... highest
+        return (lowest - 1) ... bbox.x.upperBound
     }
     
     func usableYRange(bbox: BoundingBox, xRange: ClosedRange<Int>) -> ClosedRange<Int> {
-        func iterationsToTarget(target: Int) -> Int {
-            var distance = 0
-            var n = target
-            while n > 0 {
-                distance += n
-                n -= 1
-                if bbox.x.contains(distance) {
-                    return target - n
-                }
-            }
-            fatalError()
-        }
-        
-        let lowestIterations = iterationsToTarget(target: xRange.upperBound)
-        let highestIterations = iterationsToTarget(target: xRange.lowerBound)
-        
-        let lowest = bbox.y.lowerBound + (lowestIterations * (lowestIterations + 1) / 2)
-        let highest = bbox.y.upperBound + (highestIterations * (highestIterations + 1) / 2)
-        return lowest ... highest
+        return bbox.y.lowerBound ... 300
     }
     
     func canHit(target: BoundingBox, velocityX: Int, velocityY: Int) -> Bool {
@@ -81,26 +51,33 @@ final class Day17: AOCDay {
         let input = parseInput(rawInput)
         
         let targetX = usableXRange(bbox: input)
-        let targetY = -100 ... 200 //usableYRange(bbox: input, xRange: targetX)
-        print("x: \(targetX) - y: \(targetY)")
+        let targetY = usableYRange(bbox: input, xRange: targetX)
 
         var highestY = -1
-        var n = 0
         for x in targetX {
             for y in targetY {
                 if canHit(target: input, velocityX: x, velocityY: y) {
-                    print("Solution: (\(x), \(y))")
                     highestY = max(highestY, y * (y + 1) / 2)
-                    n += 1
                 }
             }
         }
-        return "Highest: \(highestY), total: \(n)"
+        return highestY
     }
 
     func part2(rawInput: String) -> CustomStringConvertible {
-        // let input = parseInput(rawInput)
+        let input = parseInput(rawInput)
         
-        return "Unimplemented"
+        let targetX = usableXRange(bbox: input)
+        let targetY = usableYRange(bbox: input, xRange: targetX)
+
+        var total = 0
+        for x in targetX {
+            for y in targetY {
+                if canHit(target: input, velocityX: x, velocityY: y) {
+                    total += 1
+                }
+            }
+        }
+        return total
     }
 }
