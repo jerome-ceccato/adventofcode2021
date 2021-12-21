@@ -101,7 +101,7 @@ final class Day19: AOCDay {
         }
     }
     
-    func compareScans(lhs: [[Point]], rhs: [[Point]]) {
+    func compareScans(lhs: [[Point]], rhs: [[Point]]) -> Point? {
         for lhsr in lhs {
             for rhsr in rhs {
                 for leftPoint in lhsr {
@@ -112,28 +112,29 @@ final class Day19: AOCDay {
                             z: leftPoint.z - rightPoint.z)
                         
                         let nMatches = matches(lhs: lhsr, rhs: rhsr.map { $0 + offset })
-                        if nMatches >= 9 {
-                            print("\(nMatches) -> \(offset)")
-                            let b = rhsr.map { $0 + offset }
-                            for i in 0 ..< lhsr.count {
-                                print("\(lhsr[i]) - \(b[i])")
-                            }
-                            print("\(nMatches) -> \(offset)")
+                        if nMatches >= 8 {
+                            return offset
                         }
                     }
                 }
             }
         }
+        return nil
     }
-
+    
     func part1(rawInput: String) -> CustomStringConvertible {
         let input = parseInput(rawInput)
+        let scanRotations = input.map(allPossibleRotations(for:))
         
-        let scan0Rotations = allPossibleRotations(for: input[0])
-        let scan1Rotations = allPossibleRotations(for: input[1])
-        
-        compareScans(lhs: scan0Rotations, rhs: scan1Rotations)
-        return input.map(\.description).joined(separator: "\n")
+        for i in 0 ..< scanRotations.count {
+            for j in 0 ..< scanRotations.count {
+                if i != j {
+                    let offset = compareScans(lhs: scanRotations[i], rhs: scanRotations[j])
+                    print("\(i)-\(j): \(offset)")
+                }
+            }
+        }
+        return "done"
     }
 
     func part2(rawInput: String) -> CustomStringConvertible {
