@@ -76,27 +76,8 @@ final class Day19: AOCDay {
             fatalError()
         }
     }
-    
-    func rotations(for point: Point) -> [Point] {
-        let range = [-3, -2, -1, 1, 2, 3]
-        var rota = [Point]()
-        for a in range {
-            for b in range {
-                for c in range {
-                    if abs(a) == abs(b) || abs(b) == abs(c) || abs(a) == abs(c) {
-                        continue
-                    }
-                    rota.append(Point(
-                        x: coordinate(from: point, target: a),
-                        y: coordinate(from: point, target: b),
-                        z: coordinate(from: point, target: c)))
-                }
-            }
-        }
-        return rota
-    }
-    
-    func allPossibleRotations(for scanner: Scanner) -> [[Point]] {
+
+    func allPossibleRotations(for scanner: [Point]) -> [[Point]] {
         let range = [-3, -2, -1, 1, 2, 3]
         var options = [[Point]]()
         for a in range {
@@ -106,7 +87,7 @@ final class Day19: AOCDay {
                         continue
                     }
                     
-                    options.append(scanner.points.map({ p in
+                    options.append(scanner.map({ p in
                         return Point(
                             x: coordinate(from: p, target: a),
                             y: coordinate(from: p, target: b),
@@ -118,129 +99,67 @@ final class Day19: AOCDay {
         return options
     }
     
-    func compareScans(lhs: [[Point]], rhs: [[Point]]) -> Point? {
-        for lhsr in lhs {
-            for rhsr in rhs {
-                var transations = [Point: Int]()
-                for p1 in lhsr {
-                    for p2 in rhsr {
-                        let diff = p2 - p1
-                        transations[diff, default: 0] += 1
-                        if transations[diff, default: 0] >= 12 {
-                            return diff
-                        }
+    func translate(lhs: [Point], rhs: [Point]) -> [Point]? {
+        let rhsRotations = allPossibleRotations(for: rhs)
+        for rota in rhsRotations {
+            var transations = [Point: Int]()
+            for p1 in lhs {
+                for p2 in rota {
+                    let diff = p2 - p1
+                    transations[diff, default: 0] += 1
+                    if transations[diff, default: 0] >= 12 {
+                        return rota.map { $0 - diff }
                     }
                 }
             }
         }
         return nil
     }
-    
-    // diff = other - ref
-    // ref + diff = other
-    // ref = other - diff
-    
-    /*
-     -618,-824,-621
-     -537,-823,-458
-     -447,-329,318
-     404,-588,-901
-     544,-627,-890
-     528,-643,409
-     -661,-816,-575
-     390,-675,-793
-     423,-701,434
-     -345,-311,381
-     459,-707,401
-     -485,-357,347
-     These same 12 beacons (in the same order) but from the perspective of scanner 1 are:
 
-     686,422,578
-     605,423,415
-     515,917,-361
-     -336,658,858
-     -476,619,847
-     -460,603,-452
-     729,430,532
-     -322,571,750
-     -355,545,-477
-     413,935,-424
-     -391,539,-444
-     553,889,-390
-
-     */
-    
-    func convert(reference: [Point], other: [Point], offset: Point) -> [Point] {
-        //let options = rotations(for: offset)
-        let options = [Point(x: 686 - -618, y: 422 - -824, z: 578 - -621)]
-        for option in options {
-            var hits = 0
-            for point in other {
-                let offsetPoint = point - option
-                print(offsetPoint)
-                if reference.contains(offsetPoint) {
-                    hits += 1
-                }
-                
-                if hits >= 12 {
-                    return other.map { $0 + offset }
+    func trySolve(normalized: inout [[Point]], unnormalized: inout [[Point]]) {
+        for n in 0 ..< normalized.count {
+            for u in 0 ..< unnormalized.count {
+                if let points = translate(lhs: normalized[n], rhs: unnormalized[u]) {
+                    unnormalized.remove(at: u)
+                    normalized.append(points)
+                    return
                 }
             }
-            print("hits: \(hits)")
         }
         fatalError()
     }
     
     func part1(rawInput: String) -> CustomStringConvertible {
         let input = parseInput(rawInput)
-        let scanRotations = input.map(allPossibleRotations(for:))
-    
-        //let firstOffset = compareScans(lhs: [input[0].points], rhs: allPossibleRotations(for: input[1]))!
-        //convert(reference: input[0].points, other: input[1].points, offset: firstOffset)
         
-        var translations = [String: Point]()
-        for i in 0 ..< scanRotations.count {
-            for j in i ..< scanRotations.count {
-                if i != j {
-                    let offset = compareScans(lhs: scanRotations[i], rhs: scanRotations[j])
-                    print("\(i)-\(j): \(String(describing: offset))")
-                    if let offset = offset {
-                        translations["\(i)-\(j)"] = offset
-                    }
-                }
-            }
+        var normalized = [input[0].points]
+        var unnormalized = input.suffix(from: 1).map(\.points)
+        while !unnormalized.isEmpty {
+            print(unnormalized.count)
+            trySolve(normalized: &normalized, unnormalized: &unnormalized)
         }
-        print(translations)
         
-        let correctPoints = [
-            // 0
-            input[0].points,
-            // 1
-            convert(reference: input[0].points, other: input[1].points, offset: translations["0-1"]!),
-            // 3
-            convert(reference: input[0].points,
-                    other: convert(reference: input[1].points, other: input[3].points, offset: translations["1-3"]!),
-                    offset: translations["0-1"]!),
-            // 4
-            convert(reference: input[0].points,
-                    other: convert(reference: input[1].points, other: input[4].points, offset: translations["1-4"]!),
-                    offset: translations["0-1"]!),
-            
-            // 2
-            convert(reference: input[0].points,
-                    other: convert(reference: input[1].points,
-                                   other: convert(reference: input[4].points, other: input[2].points, offset: translations["2-4"]!),
-                                   offset: translations["1-4"]!),
-                    offset: translations["0-1"]!),
-        ]
+        let points = normalized.reduce(into: Set<Point>()) { acc, pts in
+            pts.forEach { acc.insert($0) }
+        }
         
-        print(correctPoints)
-        return "done"
+        return points.count
     }
 
     func part2(rawInput: String) -> CustomStringConvertible {
-        // let input = parseInput(rawInput)
+        let input = parseInput(rawInput)
         
-        return "Unimplemented"
+        var normalized = [input[0].points]
+        var unnormalized = input.suffix(from: 1).map(\.points)
+        while !unnormalized.isEmpty {
+            print(unnormalized.count)
+            trySolve(normalized: &normalized, unnormalized: &unnormalized)
+        }
+        
+        let points = normalized.reduce(into: Set<Point>()) { acc, pts in
+            pts.forEach { acc.insert($0) }
+        }
+        
+        return points.count
     }
 }
