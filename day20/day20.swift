@@ -10,7 +10,7 @@ import Foundation
 final class Day20: AOCDay {
     struct Image {
         let enhancer: [Bool]
-        let pixels: Set<Pixel>
+        let pixels: [[Bool]]
     }
     
     struct Pixel: Hashable, Equatable {
@@ -22,62 +22,60 @@ final class Day20: AOCDay {
         let chunks = raw.components(separatedBy: "\n\n").map { $0.trimmingCharacters(in: .whitespacesAndNewlines) }
         let enhancer = chunks[0].map { $0 == "#" }
         let pixelMap = chunks[1].components(separatedBy: "\n").map { $0.trimmingCharacters(in: .whitespaces) }
-
-        var pixels = Set<Pixel>()
-        for y in 0 ..< pixelMap.count {
-            for x in 0 ..< pixelMap[y].count {
-                if pixelMap[y][x] == "#" {
-                    pixels.insert(Pixel(x: x, y: y))
-                }
-            }
+        let pixels = pixelMap.map { line in
+            return line.map { $0 == "#" }
         }
+
         return Image(enhancer: enhancer, pixels: pixels)
     }
     
-    func enhance(pixel: Pixel, input: Set<Pixel>, enhancer: [Bool]) -> Bool {
+    func enhance(pixel: Pixel, input: [[Bool]], enhancer: [Bool], step: Int) -> Bool {
         var pixelValue = 0
         for yOffset in [-1, 0, 1] {
             for xOffset in [-1, 0, 1] {
                 let target = Pixel(x: pixel.x + xOffset, y: pixel.y + yOffset)
-                pixelValue = pixelValue << 1 + (input.contains(target) ? 1 : 0)
+                let inBounds = input.indices.contains(target.y) && input[target.y].indices.contains(target.x)
+                let targetValue = inBounds ? input[target.y][target.x] : (step & 1 == 1)
+                
+                pixelValue = pixelValue << 1 + (targetValue ? 1 : 0)
             }
         }
         return enhancer[pixelValue]
     }
     
-    func process(input: Set<Pixel>, enhancer: [Bool], step: Int) -> Set<Pixel> {
-        var targets = Set<Pixel>()
+    func process(input: [[Bool]], enhancer: [Bool], step: Int) -> [[Bool]] {
+        let growthRate = 1
+        let ySize = input.count
+        let xSize = input[0].count
         
-        input.forEach { pixel in
-            for yOffset in -1 ... 1 {
-                for xOffset in -1 ... 1 {
-                    targets.insert(Pixel(x: pixel.x + xOffset, y: pixel.y + yOffset))
-                }
+        var output = [[Bool]]()
+        for y in -growthRate ..< ySize + growthRate {
+            var line = [Bool]()
+            for x in -growthRate ..< xSize + growthRate {
+                line.append(enhance(pixel: Pixel(x: x, y: y), input: input, enhancer: enhancer, step: step))
             }
+            output.append(line)
         }
-        
-        return targets.reduce(into: Set<Pixel>()) { output, pixel in
-            if enhance(pixel: pixel, input: input, enhancer: enhancer) {
-                output.insert(pixel)
-            }
-        }
+        return output
     }
     
-    func display(pixels: Set<Pixel>) -> String {
-        let xCoords = pixels.map(\.x)
-        let yCoords = pixels.map(\.y)
-        
-        let xRange = xCoords.min()! ... xCoords.max()!
-        let yRange = yCoords.min()! ... yCoords.max()!
-        
+    func display(pixels: [[Bool]]) -> String {
         var output = "\n"
-        for y in yRange {
-            for x in xRange {
-                output += pixels.contains(Pixel(x: x, y: y)) ? "#" : "."
+        for y in 0 ..< pixels.count {
+            for x in 0 ..< pixels[y].count {
+                output += pixels[y][x] ? "#" : "."
             }
             output += "\n"
         }
         return output
+    }
+    
+    func countActivePixels(pixels: [[Bool]]) -> Int {
+        return pixels.reduce(0) { acc, line in
+            return acc + line.reduce(0, { acc2, item in
+                return acc2 + (item ? 1 : 0)
+            })
+        }
     }
 
     func part1(rawInput: String) -> CustomStringConvertible {
@@ -86,12 +84,17 @@ final class Day20: AOCDay {
         let processedInput = (0 ..< 2).reduce(input.pixels) { acc, step in
             return process(input: acc, enhancer: input.enhancer, step: step)
         }
-        return processedInput.count
+        
+        return countActivePixels(pixels: processedInput)
     }
 
     func part2(rawInput: String) -> CustomStringConvertible {
-        // let input = parseInput(rawInput)
+        let input = parseInput(rawInput)
         
-        return "Unimplemented"
+        let processedInput = (0 ..< 50).reduce(input.pixels) { acc, step in
+            return process(input: acc, enhancer: input.enhancer, step: step)
+        }
+        
+        return countActivePixels(pixels: processedInput)
     }
 }
