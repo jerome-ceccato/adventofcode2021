@@ -32,13 +32,9 @@ final class Day19: AOCDay {
         }
     }
     
-    struct Scanner: CustomStringConvertible {
+    struct Scanner {
         let name: String
         let points: [Point]
-        
-        var description: String {
-            return "\n--- \(name) ---\n" + points.map(\.description).joined(separator: "\n")
-        }
     }
 
     func parseInput(_ raw: String) -> [Scanner] {
@@ -62,23 +58,24 @@ final class Day19: AOCDay {
             .map(parseScanner(_:))
     }
     
-    func coordinate(from point: Point, target: Int) -> Int {
-        let sign = target < 0 ? -1 : 1
-        let coord = abs(target)
-        switch coord {
-        case 1:
-            return point.x * sign;
-        case 2:
-            return point.y * sign;
-        case 3:
-            return point.z * sign;
-        default:
-            fatalError()
-        }
-    }
-
     func allPossibleRotations(for scanner: [Point]) -> [[Point]] {
         let range = [-3, -2, -1, 1, 2, 3]
+        
+        func coordinate(from point: Point, target: Int) -> Int {
+            let sign = target < 0 ? -1 : 1
+            let coord = abs(target)
+            switch coord {
+            case 1:
+                return point.x * sign;
+            case 2:
+                return point.y * sign;
+            case 3:
+                return point.z * sign;
+            default:
+                fatalError()
+            }
+        }
+        
         var options = [[Point]]()
         for a in range {
             for b in range {
@@ -92,14 +89,19 @@ final class Day19: AOCDay {
                             x: coordinate(from: p, target: a),
                             y: coordinate(from: p, target: b),
                             z: coordinate(from: p, target: c))
-                    }).sorted())
+                    }))
                 }
             }
         }
         return options
     }
     
-    func translate(lhs: [Point], rhs: [Point]) -> [Point]? {
+    struct Translation {
+        let points: [Point]
+        let offset: Point
+    }
+    
+    func translate(lhs: [Point], rhs: [Point]) -> Translation? {
         let rhsRotations = allPossibleRotations(for: rhs)
         for rota in rhsRotations {
             var transations = [Point: Int]()
@@ -108,7 +110,7 @@ final class Day19: AOCDay {
                     let diff = p2 - p1
                     transations[diff, default: 0] += 1
                     if transations[diff, default: 0] >= 12 {
-                        return rota.map { $0 - diff }
+                        return Translation(points: rota.map { $0 - diff }, offset: diff)
                     }
                 }
             }
@@ -116,17 +118,22 @@ final class Day19: AOCDay {
         return nil
     }
 
-    func trySolve(normalized: inout [[Point]], unnormalized: inout [[Point]]) {
+    @discardableResult
+    func solveOne(normalized: inout [[Point]], unnormalized: inout [[Point]]) -> Point {
         for n in 0 ..< normalized.count {
             for u in 0 ..< unnormalized.count {
-                if let points = translate(lhs: normalized[n], rhs: unnormalized[u]) {
+                if let translation = translate(lhs: normalized[n], rhs: unnormalized[u]) {
                     unnormalized.remove(at: u)
-                    normalized.append(points)
-                    return
+                    normalized.append(translation.points)
+                    return translation.offset
                 }
             }
         }
         fatalError()
+    }
+    
+    func manhattan(lhs: Point, rhs: Point) -> Int {
+        return abs(lhs.x - rhs.x) + abs(lhs.y - rhs.y) + abs(lhs.z - rhs.z)
     }
     
     func part1(rawInput: String) -> CustomStringConvertible {
@@ -135,8 +142,7 @@ final class Day19: AOCDay {
         var normalized = [input[0].points]
         var unnormalized = input.suffix(from: 1).map(\.points)
         while !unnormalized.isEmpty {
-            print(unnormalized.count)
-            trySolve(normalized: &normalized, unnormalized: &unnormalized)
+            solveOne(normalized: &normalized, unnormalized: &unnormalized)
         }
         
         let points = normalized.reduce(into: Set<Point>()) { acc, pts in
@@ -151,15 +157,19 @@ final class Day19: AOCDay {
         
         var normalized = [input[0].points]
         var unnormalized = input.suffix(from: 1).map(\.points)
+        var positions = [Point(x: 0, y: 0, z: 0)]
+        
         while !unnormalized.isEmpty {
-            print(unnormalized.count)
-            trySolve(normalized: &normalized, unnormalized: &unnormalized)
+            positions.append(solveOne(normalized: &normalized, unnormalized: &unnormalized))
+        }
+
+        var distances = [Int]()
+        for i in 0 ..< positions.count {
+            for j in i + 1 ..< positions.count {
+                distances.append(manhattan(lhs: positions[i], rhs: positions[j]))
+            }
         }
         
-        let points = normalized.reduce(into: Set<Point>()) { acc, pts in
-            pts.forEach { acc.insert($0) }
-        }
-        
-        return points.count
+        return distances.max()!
     }
 }
