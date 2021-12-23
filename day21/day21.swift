@@ -28,7 +28,7 @@ final class Day21: AOCDay {
         var score: Int = 0
         
         init(pos: Int) {
-            position = pos - 1
+            position = pos
         }
     }
     
@@ -38,7 +38,7 @@ final class Day21: AOCDay {
             .compactMap { line in
                 Int(line.components(separatedBy: ":")[1].trimmingCharacters(in: .whitespaces))
             }
-        return (p1: positions[0], p2: positions[1])
+        return (p1: positions[0] - 1, p2: positions[1] - 1)
     }
     
     func part1(rawInput: String) -> CustomStringConvertible {
@@ -79,14 +79,65 @@ final class Day21: AOCDay {
         let score: Int
     }
     
+    struct GameState: Hashable, Equatable {
+        let p1: PlayerState
+        let p2: PlayerState
+    }
+    
     func part2(rawInput: String) -> CustomStringConvertible {
         let input = parseInput(rawInput)
         
-        var p1States = Set<PlayerState>()
-        var p2States = Set<PlayerState>()
-        p1States.insert(PlayerState(position: input.p1, score: 0))
-        p2States.insert(PlayerState(position: input.p2, score: 0))
+        var gameStates = [GameState(
+            p1: PlayerState(position: input.p1, score: 0),
+            p2: PlayerState(position: input.p2, score: 0)): 1]
         
-        return "a lot"
+        func newState(from state: PlayerState, roll: Int) -> PlayerState {
+            let position = (state.position + roll) % 10
+            let score = state.score + position + 1
+            return PlayerState(position: position, score: score)
+        }
+        
+        var universe1 = 0
+        var universe2 = 0
+        
+        func runOnce(game: [GameState: Int], turn: Int) -> [GameState: Int] {
+            var newGame = [GameState: Int]()
+            
+            for firstRoll in 1 ... 3 {
+                for secondRoll in 1 ... 3 {
+                    for thirdRoll in 1 ... 3 {
+                        for state in game {
+                            let rollValue = firstRoll + secondRoll + thirdRoll
+                            if turn == 0 {
+                                let newState = newState(from: state.key.p1, roll: rollValue)
+                                newGame[GameState(p1: newState, p2: state.key.p2), default: 0] += state.value
+                            } else {
+                                let newState = newState(from: state.key.p2, roll: rollValue)
+                                newGame[GameState(p1: state.key.p1, p2: newState), default: 0] += state.value
+                            }
+                        }
+                    }
+                }
+            }
+            
+            for k in newGame.keys {
+                if k.p1.score >= 21 {
+                    universe1 += newGame[k, default: 0]
+                    newGame.removeValue(forKey: k)
+                } else if k.p2.score >= 21 {
+                    universe2 += newGame[k, default: 0]
+                    newGame.removeValue(forKey: k)
+                }
+            }
+            
+            return newGame
+        }
+        
+        while !gameStates.isEmpty {
+            gameStates = runOnce(game: gameStates, turn: 0)
+            gameStates = runOnce(game: gameStates, turn: 1)
+        }
+
+        return max(universe1, universe2)
     }
 }
